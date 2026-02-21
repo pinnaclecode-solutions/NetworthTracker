@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Build and Deploy on VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH into VPS and deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /root/networth
+
+            # Pull latest code
+            git pull origin master
+
+            # Build the production image
+            docker build -f Dockerfile.prod -t networth-app:latest .
+
+            # Swap to the new container
+            docker stop networth-app || true
+            docker rm networth-app || true
+            docker run -d \
+              --name networth-app \
+              --restart unless-stopped \
+              -p 127.0.0.1:3000:3000 \
+              --env-file /root/networth/.env.production \
+              networth-app:latest
+
+            # Clean up unused images to save disk space
+            docker image prune -f

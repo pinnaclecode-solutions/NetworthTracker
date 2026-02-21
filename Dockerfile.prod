@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache openssl bash
+
+WORKDIR /app
+
+# Copy package files
+# Note: commit package-lock.json and switch to `npm ci` for reproducible builds
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Copy source
+COPY . .
+
+# Generate Prisma client and build
+RUN npx prisma generate
+RUN npm run build
+
+EXPOSE 3000
+
+# Run migrations then start the production server
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
