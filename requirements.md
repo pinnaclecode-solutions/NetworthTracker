@@ -175,5 +175,4 @@ All technology choices have been decided with ease of development and deployment
 - `GOOGLE_CLIENT_ID` — From Google Cloud Console OAuth credentials
 - `GOOGLE_CLIENT_SECRET` — From Google Cloud Console OAuth credentials
 
----
 
