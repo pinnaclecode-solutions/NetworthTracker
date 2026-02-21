@@ -1,4 +1,4 @@
-import { withAuth } from "next-auth/middleware";
+import { withAuth, NextRequestWithAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -11,7 +11,7 @@ export default function middleware(
   if (process.env.DISABLE_AUTH === "true") {
     return NextResponse.next();
   }
-  return authMiddleware(req, event);
+  return authMiddleware(req as NextRequestWithAuth, event);
 }
 
 export const config = {
